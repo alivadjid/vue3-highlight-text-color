@@ -31,4 +31,31 @@ defineExpose({ element });
   <div ref="element"></div>
 </template>
 
-<style></style>
+<style>
+[data-highlight-id] {
+  background-color: var(
+    --vth-highlight-background,
+    var(--vth-highlight-color)
+  ) !important;
+  color: var(--vth-highlight-foreground, inherit);
+  border-radius: var(--vth-highlight-border-radius, 0);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+code [data-highlight-id] {
+  padding-inline: var(--vth-highlight-code-padding-inline, 0);
+  background-color: var(
+    --vth-highlight-code-background,
+    var(--vth-highlight-background, var(--vth-highlight-color))
+  ) !important;
+  color: var(
+    --vth-highlight-code-foreground,
+    var(--vth-highlight-foreground, inherit)
+  );
+  border-radius: var(
+    --vth-highlight-code-border-radius,
+    var(--vth-highlight-border-radius, 0)
+  );
+}
+</style>

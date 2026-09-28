@@ -12,7 +12,14 @@ import TextDataKey from "@/components/TextDataKey.vue";
 
 import Colors from "@/components/Colors.vue";
 
-import type { Marker, MarkerRange, NewMarker } from "../interface";
+import { MARKER_COLOR_LIST } from "@/constants";
+
+import type {
+  ColorPickerSlotProps,
+  Marker,
+  MarkerRange,
+  NewMarker,
+} from "../interface";
 
 import { createMarkerFromRange } from "../core/highlight";
 
@@ -41,6 +48,12 @@ const selectedRange = shallowRef<Range>();
 const markersForText = computed(() =>
   props.markers.filter((marker) => marker.textId === props.textId)
 );
+const pickerSlotProps = computed<ColorPickerSlotProps>(() => ({
+  colors: props.colors ?? MARKER_COLOR_LIST,
+  chooseColor: handleColorChoose,
+  removeHighlight: handleRemoveHighlight,
+  close: closeColorMenu,
+}));
 const menuX = ref("-9999px");
 const menuY = ref("-9999px");
 const closeDelay = 3_500;
@@ -196,11 +209,15 @@ onBeforeUnmount(() => {
       @pointerenter="clearCloseTimer"
       @pointerleave="startCloseTimer"
     >
-      <Colors
-        :colors="props.colors"
-        @colorChoose="handleColorChoose"
-        @remove="handleRemoveHighlight"
-      />
+      <slot name="color-picker" v-bind="pickerSlotProps">
+        <div :class="$style.defaultColorMenu">
+          <Colors
+            :colors="pickerSlotProps.colors"
+            @colorChoose="handleColorChoose"
+            @remove="handleRemoveHighlight"
+          />
+        </div>
+      </slot>
     </div>
   </Teleport>
 </template>
@@ -211,6 +228,10 @@ onBeforeUnmount(() => {
   top: v-bind(menuY);
   left: v-bind(menuX);
   z-index: 999;
+  max-width: calc(100vw - 16px);
+}
+
+.defaultColorMenu {
   width: min(264px, calc(100vw - 16px));
   padding: 12px;
   background: #fff;

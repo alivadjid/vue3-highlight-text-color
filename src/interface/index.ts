@@ -19,3 +19,10 @@ export interface NewMarker extends MarkerRange {
 export interface Marker extends NewMarker {
   id: string | number;
 }
+
+export interface ColorPickerSlotProps {
+  colors: readonly string[];
+  chooseColor: (color: string) => void;
+  removeHighlight: () => void;
+  close: () => void;
+}

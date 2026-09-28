@@ -69,6 +69,35 @@ function removeHighlight(range: MarkerRange) {
 | `handle-new-highlight` | `NewMarker` | Emitted after a user chooses a colour for a selection. Persist it with an `id`. |
 | `handle-remove-highlight` | `MarkerRange` | Emitted for the selected range to remove. |
 
+### Slots
+
+`color-picker` replaces the default colour picker while preserving the
+library's selection, popup positioning, dismissal, and marker creation.
+
+| Slot prop | Type | Description |
+| --- | --- | --- |
+| `colors` | `readonly string[]` | Resolved `colors` prop, or the default palette. |
+| `chooseColor` | `(color: string) => void` | Creates a highlight for the active selection. |
+| `removeHighlight` | `() => void` | Removes highlights intersecting the active selection. |
+| `close` | `() => void` | Closes the picker without changing highlights. |
+
+```vue
+<TextHighlighter :text="article" :text-id="1" :markers="highlights">
+  <template #color-picker="{ colors, chooseColor, close }">
+    <div class="my-picker">
+      <button
+        v-for="color in colors"
+        :key="color"
+        class="my-square-swatch"
+        :style="{ backgroundColor: color }"
+        @click="chooseColor(color)"
+      />
+      <button @click="close">Cancel</button>
+    </div>
+  </template>
+</TextHighlighter>
+```
+
 ### Data types
 
 ```ts
@@ -82,6 +111,35 @@ type NewMarker = {
 
 type Marker = NewMarker & { id: string | number };
 type MarkerRange = Pick<NewMarker, "textId" | "range">;
+```
+
+### Styling highlights
+
+Each generated highlight exposes its saved colour as
+`--vth-highlight-color`. The following variables can be set on a parent
+element to adapt marker styling without relying on generated class names:
+
+| Variable | Purpose |
+| --- | --- |
+| `--vth-highlight-background` | Background for all highlights; defaults to each marker's saved colour. |
+| `--vth-highlight-foreground` | Text colour in a highlight. |
+| `--vth-highlight-border-radius` | Corner radius for highlights. |
+| `--vth-highlight-code-background` | Background for highlights nested in `<code>`. |
+| `--vth-highlight-code-foreground` | Text colour for highlights nested in `<code>`. |
+| `--vth-highlight-code-border-radius` | Corner radius for highlights nested in `<code>`. |
+| `--vth-highlight-code-padding-inline` | Horizontal padding for highlights nested in `<code>`. |
+
+```css
+.article {
+  --vth-highlight-foreground: #172033;
+  --vth-highlight-border-radius: 0.2em;
+}
+
+.article code {
+  --vth-highlight-code-background: #dbeafe;
+  --vth-highlight-code-foreground: #1e3a8a;
+  --vth-highlight-code-padding-inline: 0.15em;
+}
 ```
 
 When highlights overlap, the last matching item in `markers` has visual
