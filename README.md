@@ -69,6 +69,35 @@ function removeHighlight(range: MarkerRange) {
 | `handle-new-highlight` | `NewMarker` | Emitted after a user chooses a colour for a selection. Persist it with an `id`. |
 | `handle-remove-highlight` | `MarkerRange` | Emitted for the selected range to remove. |
 
+### Slots
+
+`color-picker` replaces the default colour picker while preserving the
+library's selection, popup positioning, dismissal, and marker creation.
+
+| Slot prop | Type | Description |
+| --- | --- | --- |
+| `colors` | `readonly string[]` | Resolved `colors` prop, or the default palette. |
+| `chooseColor` | `(color: string) => void` | Creates a highlight for the active selection. |
+| `removeHighlight` | `() => void` | Removes highlights intersecting the active selection. |
+| `close` | `() => void` | Closes the picker without changing highlights. |
+
+```vue
+<TextHighlighter :text="article" :text-id="1" :markers="highlights">
+  <template #color-picker="{ colors, chooseColor, close }">
+    <div class="my-picker">
+      <button
+        v-for="color in colors"
+        :key="color"
+        class="my-square-swatch"
+        :style="{ backgroundColor: color }"
+        @click="chooseColor(color)"
+      />
+      <button @click="close">Cancel</button>
+    </div>
+  </template>
+</TextHighlighter>
+```
+
 ### Data types
 
 ```ts

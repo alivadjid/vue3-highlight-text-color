@@ -23,11 +23,12 @@ describe("playground highlight removal", () => {
     await settle();
 
     expect(wrapper.get("h1").text()).toBe("Three independent documents");
-    expect(wrapper.findAll("section")).toHaveLength(3);
-    expect(wrapper.findAllComponents(TextDataKey)).toHaveLength(3);
+    expect(wrapper.findAll("section")).toHaveLength(4);
+    expect(wrapper.findAllComponents(TextDataKey)).toHaveLength(4);
     expect(wrapper.text()).toContain(
       "Do not start a selection in one document and finish it in another."
     );
+    expect(wrapper.text()).toContain("Dedicated story — custom colour picker");
   });
 
   it("switches playground copy to Russian without changing the lorem content", async () => {

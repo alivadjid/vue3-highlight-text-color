@@ -26,6 +26,11 @@ const playgroundColors = [
   "#334155",
   "#FFFFFF",
 ];
+const customPickerColors = ["#FDE68A", "#86EFAC", "#93C5FD", "#C4B5FD", "#FDA4AF"];
+const customPickerExample = {
+  id: 4,
+  text: "<p>Select this text to open a custom colour picker. Its square swatches, heading, and actions are rendered by the consuming application through the <code>color-picker</code> slot.</p>",
+};
 type Locale = "ru" | "en";
 
 const locale = ref<Locale>("en");
@@ -47,6 +52,16 @@ const copy = computed(() =>
         range: "Диапазон",
         noSavedRanges: "Сохранённых диапазонов пока нет.",
         clearSaved: "Очистить сохранения",
+        customPicker: {
+          title: "Отдельная история — кастомный выбор цвета",
+          description:
+            "Этот TextHighlighter использует slot color-picker. Приложение полностью рисует окно выбора, а библиотека сохраняет диапазон, позиционирование и действия.",
+          pickerTitle: "Моя палитра",
+          pickerDescription: "Квадратные плитки — пользовательская разметка.",
+          chooseColor: "Выбрать цвет",
+          closePicker: "Закрыть выбор цвета",
+          removeHighlight: "Убрать выделение",
+        },
         examples: [
           {
             title: "Параграф 1 — базовое выделение",
@@ -80,6 +95,16 @@ const copy = computed(() =>
         range: "Range",
         noSavedRanges: "No saved ranges yet.",
         clearSaved: "Clear saved highlights",
+        customPicker: {
+          title: "Dedicated story — custom colour picker",
+          description:
+            "This TextHighlighter uses the color-picker slot. The application renders the entire picker while the library keeps the range, positioning, and actions.",
+          pickerTitle: "My palette",
+          pickerDescription: "Square swatches are consumer-owned markup.",
+          chooseColor: "Choose colour",
+          closePicker: "Close colour picker",
+          removeHighlight: "Remove highlight",
+        },
         examples: [
           {
             title: "Paragraph 1 — basic highlighting",
@@ -114,7 +139,7 @@ const examples = [
   },
 ];
 const savedRangesByText = computed(() =>
-  examples.map((example) => ({
+  [...examples, customPickerExample].map((example) => ({
     id: example.id,
     markers: savedMarkers.value.filter((marker) => marker.textId === example.id),
   }))
@@ -152,41 +177,41 @@ if (markers) {
 </script>
 <template>
   <main :class="$style.playground">
-    <header :class="$style.header">
-      <div :class="$style.headerTopline">
-        <p :class="$style.eyebrow">Vue Text Highlighter</p>
-        <div :class="$style.headerControls">
+    <div :class="$style.stickyToolbar">
+      <p :class="$style.eyebrow">Vue Text Highlighter</p>
+      <div :class="$style.headerControls">
+        <button
+          type="button"
+          :class="$style.rangesButton"
+          :aria-expanded="isRangesPanelOpen"
+          aria-controls="saved-ranges-panel"
+          @click="isRangesPanelOpen = true"
+        >
+          {{ copy.showRanges }}
+        </button>
+        <div :class="$style.languageSwitcher" :aria-label="copy.languageLabel">
           <button
             type="button"
-            :class="$style.rangesButton"
-            :aria-expanded="isRangesPanelOpen"
-            aria-controls="saved-ranges-panel"
-            @click="isRangesPanelOpen = true"
+            :class="[$style.languageButton, { [$style.activeLanguage]: locale === 'ru' }]"
+            :aria-label="copy.switchToRussian"
+            :aria-pressed="locale === 'ru'"
+            @click="locale = 'ru'"
           >
-            {{ copy.showRanges }}
+            RU
           </button>
-          <div :class="$style.languageSwitcher" :aria-label="copy.languageLabel">
-            <button
-              type="button"
-              :class="[$style.languageButton, { [$style.activeLanguage]: locale === 'ru' }]"
-              :aria-label="copy.switchToRussian"
-              :aria-pressed="locale === 'ru'"
-              @click="locale = 'ru'"
-            >
-              RU
-            </button>
-            <button
-              type="button"
-              :class="[$style.languageButton, { [$style.activeLanguage]: locale === 'en' }]"
-              :aria-label="copy.switchToEnglish"
-              :aria-pressed="locale === 'en'"
-              @click="locale = 'en'"
-            >
-              EN
-            </button>
-          </div>
+          <button
+            type="button"
+            :class="[$style.languageButton, { [$style.activeLanguage]: locale === 'en' }]"
+            :aria-label="copy.switchToEnglish"
+            :aria-pressed="locale === 'en'"
+            @click="locale = 'en'"
+          >
+            EN
+          </button>
         </div>
       </div>
+    </div>
+    <header :class="$style.header">
       <h1>{{ copy.title }}</h1>
       <p :class="$style.notice">{{ copy.notice }}</p>
     </header>
@@ -212,6 +237,63 @@ if (markers) {
         @handle-new-highlight="handleNewHighlight"
         @handle-remove-highlight="handleRemoveHighlight"
       />
+    </section>
+
+    <section :class="$style.example" aria-labelledby="custom-picker-example">
+      <header :class="$style.exampleHeader">
+        <p :class="$style.documentId">{{ copy.document }} {{ customPickerExample.id }}</p>
+        <h2 id="custom-picker-example">{{ copy.customPicker.title }}</h2>
+        <p>{{ copy.customPicker.description }}</p>
+      </header>
+      <TextHighlighter
+        :text="customPickerExample.text"
+        :text-id="customPickerExample.id"
+        :markers="savedMarkers"
+        :colors="customPickerColors"
+        @handle-new-highlight="handleNewHighlight"
+        @handle-remove-highlight="handleRemoveHighlight"
+      >
+        <template
+          #color-picker="{ colors, chooseColor, removeHighlight, close }"
+        >
+          <section :class="$style.customPicker" :aria-label="copy.customPicker.pickerTitle">
+            <header :class="$style.customPickerHeader">
+              <div>
+                <strong>{{ copy.customPicker.pickerTitle }}</strong>
+                <p>{{ copy.customPicker.pickerDescription }}</p>
+              </div>
+              <button
+                type="button"
+                :class="$style.customPickerClose"
+                :aria-label="copy.customPicker.closePicker"
+                @click="close"
+              >
+                ×
+              </button>
+            </header>
+            <div :class="$style.customColorGrid" role="list">
+              <button
+                v-for="color in colors"
+                :key="color"
+                type="button"
+                :class="$style.customColorTile"
+                :style="{ backgroundColor: color }"
+                :aria-label="`${copy.customPicker.chooseColor}: ${color}`"
+                :title="color"
+                role="listitem"
+                @click="chooseColor(color)"
+              />
+            </div>
+            <button
+              type="button"
+              :class="$style.customRemoveButton"
+              @click="removeHighlight"
+            >
+              {{ copy.customPicker.removeHighlight }}
+            </button>
+          </section>
+        </template>
+      </TextHighlighter>
     </section>
   </main>
 
@@ -313,11 +395,21 @@ if (markers) {
   margin-bottom: 8px;
 }
 
-.headerTopline {
+.stickyToolbar {
+  position: sticky;
+  top: 12px;
+  z-index: 100;
   display: flex;
   gap: 16px;
   align-items: center;
   justify-content: space-between;
+  align-self: start;
+  padding: 8px 10px 8px 16px;
+  background: rgb(15 23 42 / 94%);
+  border: 1px solid rgb(148 163 184 / 28%);
+  border-radius: 12px;
+  box-shadow: 0 10px 24px rgb(15 23 42 / 30%);
+  backdrop-filter: blur(12px);
 }
 
 .headerControls {
@@ -533,5 +625,80 @@ if (markers) {
 .clearButton:disabled {
   cursor: not-allowed;
   opacity: 0.45;
+}
+
+.customPicker {
+  display: grid;
+  gap: 14px;
+  width: min(320px, calc(100vw - 16px));
+  padding: 16px;
+  color: #172033;
+  background: #f8fafc;
+  border: 3px solid #172033;
+  border-radius: 4px;
+  box-shadow: 8px 8px 0 #7dd3fc;
+}
+
+.customPickerHeader {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.customPickerHeader strong {
+  font-size: 1rem;
+}
+
+.customPickerHeader p {
+  margin: 4px 0 0;
+  color: #475569;
+  font-size: 0.8rem;
+}
+
+.customPickerClose {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  color: #172033;
+  font-size: 1.25rem;
+  line-height: 1;
+  background: transparent;
+  border: 2px solid currentColor;
+  border-radius: 0;
+}
+
+.customColorGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+.customColorTile {
+  aspect-ratio: 1;
+  padding: 0;
+  cursor: pointer;
+  border: 2px solid #172033;
+  border-radius: 0;
+  box-shadow: 3px 3px 0 #172033;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.customColorTile:hover,
+.customColorTile:focus-visible {
+  box-shadow: 5px 5px 0 #172033;
+  transform: translate(-2px, -2px);
+}
+
+.customRemoveButton {
+  justify-self: start;
+  padding: 7px 10px;
+  color: #991b1b;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  background: #fee2e2;
+  border: 2px solid currentColor;
+  border-radius: 0;
 }
 </style>
