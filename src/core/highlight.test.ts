@@ -78,6 +78,28 @@ describe("highlight core", () => {
     ]);
   });
 
+  it("exposes the marker colour as a CSS variable, including inside code", () => {
+    const source = "<p>Before <code>code</code> after</p>";
+    const root = createRoot(source);
+    const marker = {
+      id: "all",
+      textId: 1,
+      color: "#86EFAC",
+      range: { start: 0, end: 17 },
+    };
+
+    renderMarkers(root, source, [marker], 1);
+
+    const spans = Array.from(root.querySelectorAll<HTMLSpanElement>("span"));
+    expect(spans).toHaveLength(3);
+    expect(
+      root.querySelector<HTMLSpanElement>("code > span")?.dataset.highlightId
+    ).toBe("all");
+    expect(
+      spans.map((span) => span.style.getPropertyValue("--vth-highlight-color"))
+    ).toEqual(["#86EFAC", "#86EFAC", "#86EFAC"]);
+  });
+
   it("ignores malformed and out-of-bounds persisted markers", () => {
     const root = createRoot("hello");
     const markers = [

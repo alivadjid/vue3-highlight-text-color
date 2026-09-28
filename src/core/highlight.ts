@@ -138,6 +138,7 @@ function wrapSegment(node: Text, start: number, end: number, marker: Marker) {
   const trailingNode = selectedNode.splitText(end - start);
   const span = document.createElement("span");
 
+  span.style.setProperty("--vth-highlight-color", marker.color);
   span.style.backgroundColor = marker.color;
   span.dataset.highlightId = String(marker.id);
   span.append(selectedNode);

@@ -113,6 +113,35 @@ type Marker = NewMarker & { id: string | number };
 type MarkerRange = Pick<NewMarker, "textId" | "range">;
 ```
 
+### Styling highlights
+
+Each generated highlight exposes its saved colour as
+`--vth-highlight-color`. The following variables can be set on a parent
+element to adapt marker styling without relying on generated class names:
+
+| Variable | Purpose |
+| --- | --- |
+| `--vth-highlight-background` | Background for all highlights; defaults to each marker's saved colour. |
+| `--vth-highlight-foreground` | Text colour in a highlight. |
+| `--vth-highlight-border-radius` | Corner radius for highlights. |
+| `--vth-highlight-code-background` | Background for highlights nested in `<code>`. |
+| `--vth-highlight-code-foreground` | Text colour for highlights nested in `<code>`. |
+| `--vth-highlight-code-border-radius` | Corner radius for highlights nested in `<code>`. |
+| `--vth-highlight-code-padding-inline` | Horizontal padding for highlights nested in `<code>`. |
+
+```css
+.article {
+  --vth-highlight-foreground: #172033;
+  --vth-highlight-border-radius: 0.2em;
+}
+
+.article code {
+  --vth-highlight-code-background: #dbeafe;
+  --vth-highlight-code-foreground: #1e3a8a;
+  --vth-highlight-code-padding-inline: 0.15em;
+}
+```
+
 When highlights overlap, the last matching item in `markers` has visual
 priority. `subtractMarkerRange(markers, range)` returns a new marker list and
 does not mutate its inputs.
