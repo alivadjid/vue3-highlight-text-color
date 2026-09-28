@@ -29,7 +29,7 @@ const playgroundColors = [
 const customPickerColors = ["#FDE68A", "#86EFAC", "#93C5FD", "#C4B5FD", "#FDA4AF"];
 const customPickerExample = {
   id: 4,
-  text: "<p>Select this text to open a custom colour picker. Its square swatches, heading, and actions are rendered by the consuming application through the <code>color-picker</code> slot.</p>",
+  text: "<p>Select any part of this document to open a custom colour picker. The square swatches, heading, close control, and removal action are rendered by the consuming application.</p><p>The library keeps only the responsibilities that must remain consistent: it stores the selected range, positions the popup near that range, and creates or removes the saved highlight after an action.</p><p>Try selecting a short phrase, a sentence, or text across these paragraphs. The custom interface can use any palette and any visual style while preserving the same marker data format.</p>",
 };
 type Locale = "ru" | "en";
 
